@@ -13,7 +13,6 @@ Lalu, disk-nya akan muncul sebagai /dev/sdX.${rst}"
 # Lokasi log
 #LOG_FILE="/var/log/nvme-health.log"
 DATE=$(date '+%Y-%m-%d %H:%M:%S')
-clear  
 echo -e "${pth}Silakan pilih Disk Mana Yang Mau DIcek ?$rst"
 echo -e ""
 echo -e "     \e[1;32m1)\e[0m NVME"
@@ -24,10 +23,10 @@ read -p "   Please select numbers 1-3 : " plh
 echo ""
 if [[ $plh == "1" ]]; then
     read -p "Masukkan nama device NVMe: " DEVICE
-
+    sudo nvme smart-log /dev/$DEVICE
     # Cek SMART data NVMe
     NVME_INFO=$(nvme smart-log /dev/$DEVICE)
-    sudo nvme smart-log /dev/$DEVICE
+    
     # Ambil nilai penting
     PERCENT_USED=$(echo "$NVME_INFO" | grep "percentage_used" | awk '{print $3}' | tr -d '%')
     MEDIA_ERRORS=$(echo "$NVME_INFO" | grep "media_errors" | awk '{print $3}')
@@ -35,7 +34,7 @@ if [[ $plh == "1" ]]; then
 
     # Simpan log
     #echo "$DATE - Used: ${PERCENT_USED}%, Media Errors: $MEDIA_ERRORS, Temp: ${TEMP}C" >> "$LOG_FILE"
-    echo -e "\e[1;32m2)\e[0m $DATE - Used: ${PERCENT_USED}%, Media Errors: $MEDIA_ERRORS, Temp: ${TEMP}C${rst}"
+    echo -e "\e[1;32m $DATE - Used: ${PERCENT_USED}%, Media Errors: $MEDIA_ERRORS, Temp: ${TEMP}C${rst}"
 
     # Cek kondisi abnormal
     if [ "$MEDIA_ERRORS" -gt 0 ] || [ "$PERCENT_USED" -ge 90 ]; then
